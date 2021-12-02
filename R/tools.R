@@ -21,10 +21,11 @@ logRowSums <- function(u){
 start.paramCont <- function(ech, K, band){
   centers <- sample(1:ech$n, K)
   pi <- rep(1/K, K)
-  rho <- matrix(runif(K * ech$d)/3 + .33, K, ech$d)
+  #rho <- matrix(runif(K * ech$d)/3 + .33, K, ech$d)
+  rho <- matrix(runif(K * ech$d), K, ech$d)
   log.weights <- matrix(log(pi), ech$n, K, byrow = TRUE)
   for (k in 1:K){
-    log.weights <- log.weights + rowSums(sweep(x = ech$r, MARGIN = 2, STATS = log(rho[k,]), FUN =  "*") + sweep(x = 1 - ech$r, MARGIN = 2, STATS = log(1 - rho[k,]), FUN = "*"))
+    log.weights[,k] <- log.weights[,k] + rowSums(sweep(x = ech$r, MARGIN = 2, STATS = log(rho[k,]), FUN =  "*") + sweep(x = 1 - ech$r, MARGIN = 2, STATS = log(1 - rho[k,]), FUN = "*"))
     for (j in 1:ech$d){
       mu <- mean(ech$xobs[,j], na.rm = TRUE)
       sd <- sd(ech$xobs[,j], na.rm = TRUE)
@@ -42,7 +43,7 @@ start.paramCont <- function(ech, K, band){
 start.paramMixed <- function(ech, K, band){
   centers <- sample(1:ech$n, K)
   pi <- rep(1/K, K)
-  rho <- matrix(runif(K * ech$d)/3 + .33, K, ech$d)
+  rho <- matrix(runif(K * ech$d), K, ech$d)
   log.weights <- matrix(log(pi), ech$n, K, byrow = TRUE)
   alpha <- list()
   length(alpha) <- ech$d
@@ -50,7 +51,7 @@ start.paramMixed <- function(ech, K, band){
     alpha[[j]] <- matrix(NA, K, nlevels(ech$xobs[,j]))
   }
   for (k in 1:K){
-    log.weights <- log.weights + rowSums(sweep(x = ech$r, MARGIN = 2, STATS = log(rho[k,]), FUN =  "*") + sweep(x = 1 - ech$r, MARGIN = 2, STATS = log(1 - rho[k,]), FUN = "*"))
+    log.weights[,k] <- log.weights[,k] + rowSums(sweep(x = ech$r, MARGIN = 2, STATS = log(rho[k,]), FUN =  "*") + sweep(x = 1 - ech$r, MARGIN = 2, STATS = log(1 - rho[k,]), FUN = "*"))
     for (j in ech$contvbles){
       mu <- mean(ech$xobs[,j], na.rm = TRUE)
       sd <- sd(ech$xobs[,j], na.rm = TRUE)
@@ -78,16 +79,15 @@ start.paramMixed <- function(ech, K, band){
 start.paramCat <- function(ech, K, band){
   centers <- sample(1:ech$n, K)
   pi <- rep(1/K, K)
-  rho <- matrix(runif(K * ech$d)/3 + .33, K, ech$d)
+  rho <- matrix(runif(K * ech$d), K, ech$d)
   log.weights <- matrix(log(pi), ech$n, K, byrow = TRUE)
   alpha <- list()
   length(alpha) <- ech$d
   for (j in ech$catvbles){
     alpha[[j]] <- matrix(NA, K, nlevels(ech$xobs[,j]))
   }
-
   for (k in 1:K){
-    log.weights <- log.weights + rowSums(sweep(x = ech$r, MARGIN = 2, STATS = log(rho[k,]), FUN =  "*") + sweep(x = 1 - ech$r, MARGIN = 2, STATS = log(1 - rho[k,]), FUN = "*"))
+    log.weights[,k] <- log.weights[,k] + rowSums(sweep(x = ech$r, MARGIN = 2, STATS = log(rho[k,]), FUN =  "*") + sweep(x = 1 - ech$r, MARGIN = 2, STATS = log(1 - rho[k,]), FUN = "*"))
     for (j in ech$catvbles){
       tmpalpha <- runif(nlevels(ech$xobs[,j]))
       if (ech$r[centers[k], j]) tmpalpha[ech$xobs[centers[k],j]] <-  tmpalpha[ech$xobs[centers[k],j]] + runif(1)

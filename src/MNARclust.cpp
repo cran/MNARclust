@@ -5,7 +5,7 @@ using namespace arma;
 using namespace std;
 
 colvec GdensV(const colvec x){
-  return exp(-0.5 * x % x) / sqrt(2 * PI);
+  return exp(-0.5 * x % x) / sqrt(2 * M_PI);
 }
 
 // [[Rcpp::export]]
